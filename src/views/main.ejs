@@ -1,12 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>main</title>
+  <style>
+    .chat-room-main {
+      width: 800px;
+      height: 600px;
+      border: solid 1px #ddd;
+      margin: 0 auto;
+      box-shadow: 5px 5px 5px #efefef;
+    }
+
+    .chat-room-title {
+      height: 10%;
+      border-bottom: solid 1px #ddd;
+      text-align: center;
+      line-height: 60px;
+    }
+
+    .chat-room-body {
+      height: 90%;
+    }
+
+    .chat-room-friend {
+      float: left;
+      width: 10%;
+      height: 80%;
+      border-right: solid 1px #ddd;
+      border-bottom: solid 1px #ddd;
+    }
+
+    .chat-room-friend-item {
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: red;
+      text-align: center;
+      color: #fff;
+      font-size: 20px;
+      line-height: 50px;
+      font-weight: bold;
+      margin:10px auto;
+      cursor: pointer;
+    }
+
+    .chat-room-message {
+      float: left;
+      width: 89.8%;
+      height: 80%;
+      border-bottom: solid 1px #ddd;
+    }
+
+    .chat-room-send {
+      float: left;
+      width: 100%;
+      height: 20%;
+    }
+    .chat-room-send-data{
+      width: 79.5%;
+      height: 92.5%;
+      border:none;
+      resize:none;
+      float: left;
+    }
+    .chat-room-send-btn{
+      width: 20%;
+      height: 99.5%;
+      font-size: 25px;
+    }
+  </style>
 </head>
+
 <body>
-  <div>test ejs</div>
+  <div class="chat-room-main">
+    <div class="chat-room-title">
+      <font>欢乐聊天室</font>
+    </div>
+    <div class="chat-room-body">
+      <div class="chat-room-friend">
+        <div class="chat-room-friend-item">
+          张
+        </div>
+        <div class="chat-room-friend-item">
+          李
+        </div>
+        <div class="chat-room-friend-item">
+          王
+        </div>
+      </div>
+      <div class="chat-room-message"></div>
+      <div class="chat-room-send">
+        <textarea type="text" class="chat-room-send-data"></textarea>
+        <button type="button" class="chat-room-send-btn">
+          发送
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>
