@@ -13,7 +13,7 @@ app.use('/', router)
 //   saveUninitialiazed:false //强制没有‘初始化’的session保存到storage中
 // }));
 let sockets = [];
-let nickNameLs = [];
+// let nickNameLs = [];
 sockteio.on('connection', socket => {
   console.log('1个客户端连接')
   sockets.push(socket)
@@ -27,8 +27,8 @@ sockteio.on('connection', socket => {
   });
   socket.on('sendNickName', data => {
     console.log(data)
-    nickNameLs.push(data.nickName);
-    data.allNickName = nickNameLs;
+    // nickNameLs.push(data.nickName);
+    // data.allNickName = nickNameLs;
     socket.emit('storageNickName', JSON.stringify(data))
   });
 })

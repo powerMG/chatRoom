@@ -208,12 +208,12 @@
         // 隐藏当前昵称输入框
         nickNameGroup.style = 'display:none;'
         nickName = {
-          value: storageNickName.nickName
+          value: storageNickName
         }
-        // 推送当前昵称，并进行广播
-        socket.emit('sendNickName', {
-          nickName: storageNickName.nickName
-        })
+        // // 推送当前昵称，并进行广播
+        // socket.emit('sendNickName', {
+        //   nickName: storageNickName.nickName
+        // })
       } else {
         nickName = document.getElementById('nickName')
       }
