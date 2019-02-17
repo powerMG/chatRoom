@@ -7,6 +7,10 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>main</title>
   <style>
+    *{
+      margin:0;
+      padding: 0;
+    }
     .chat-room-main {
       width: 800px;
       height: 600px;
@@ -53,6 +57,7 @@
       width: 89.8%;
       height: 80%;
       border-bottom: solid 1px #ddd;
+      overflow: auto;
     }
     .chat-room-msg-group{
       width: 100%;
@@ -100,6 +105,55 @@
       height: 99.5%;
       font-size: 25px;
     }
+    .chat-room-nick-name-main{
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+    }
+    .nick-name-shade{
+      background: rgba(0, 0, 0, .85);
+      z-index: 1;
+    }
+    .chat-room-nick-name{
+      border-radius: 10px;
+      border:solid 1px #ddd;
+      width: 300px;
+      height: 150px;
+      position:fixed;
+      top: 20%;
+      background: #fff;
+      right: 40%;
+      z-index: 2;
+    }
+    .nick-name-shade{
+      width: 100%;
+      height: 100%;
+    }
+    .nick-name-head{
+      height: 20%;
+      padding: 5px 10px;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+    }
+    .nick-name-data{
+      height: 50%;
+      text-align: center;
+      line-height: 70px;
+    }
+    .nick-name-footer{
+      height: 30%;
+      border-top: 1px solid #ddd;
+      padding:10px;
+    }
+    .nick-name-footer>button{
+      float:right;
+      width: 50px;
+      height: 30px;
+      background: red;
+      border-radius: 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -109,14 +163,9 @@
       <font>欢乐聊天室</font>
     </div>
     <div class="chat-room-body">
-      <div class="chat-room-friend">
-        <%for(var i=0;i<clients.length;i++){%>
-        <div class="chat-room-friend-item">
-          h<%=i%>
-        </div>
-        <%}%>
-      </div>
-      <div class="chat-room-message" id="msgBody">         
+      <!-- <div class="chat-room-friend" id="clients">
+      </div> -->
+      <div class="chat-room-message" id="msgBody">
       </div>
       <div class="chat-room-send">
         <textarea type="text" id="msg" class="chat-room-send-data"></textarea>
@@ -126,51 +175,102 @@
       </div>
     </div>
   </div>
+  <div class="chat-room-nick-name-main" id="nickBaneGroup">
+    <div class="nick-name-shade"></div>
+    <div class="chat-room-nick-name">
+      <form>
+        <div class="nick-name-head">
+          聊天昵称
+        </div>
+        <div class="nick-name-data">
+          <label>昵称：</label>
+          <input type="text" id="nickName" />
+        </div>
+        <div class="nick-name-footer">
+          <button type="button" id="submitNickName">确定</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script type="text/javascript" src="/socket.io/socket.io.js"></script>
   <script>
-    let nickName='';
-    let userInfo=[];
-    window.onload=function(){
-      if(nickName===''){
-        nickName=prompt('输入临时昵称')
+    const NICK_NAME = 'NICKNAME';
+    let storageNickName = sessionStorage.getItem(NICK_NAME) || '';
+    let userInfo = [];
+    window.onload = function () {
+      let socket = io()
+      let docSend = document.getElementById('send')
+      let msg = document.getElementById('msg')
+      let btnNickNameOk = document.getElementById('submitNickName')
+      let nickNameGroup = document.getElementById('nickBaneGroup')
+      let nickName;
+      if (storageNickName !== '') {
+        // 隐藏当前昵称输入框
+        nickNameGroup.style = 'display:none;'
+        nickName = {
+          value: storageNickName.nickName
+        }
+        // 推送当前昵称，并进行广播
+        socket.emit('sendNickName', {
+          nickName: storageNickName.nickName
+        })
+      } else {
+        nickName = document.getElementById('nickName')
       }
-      let socket=io()
-      let docSend=document.getElementById('send')
-      let msg=document.getElementById('msg')
-      docSend.onclick=()=>{
-        socket.emit('sendMsg',{
-          nickName:nickName,
-          message:msg.value
+      // 记录nickName
+      btnNickNameOk.onclick = () => {
+        if (nickName.value && nickName.value === '') {
+          return false;
+        }
+        socket.emit('sendNickName', {
+          nickName: nickName.value
+        })
+        // 隐藏当前昵称输入框
+        nickNameGroup.style = 'display:none;'
+      }
+      // 发送消息
+      docSend.onclick = () => {
+        socket.emit('sendMsg', {
+          nickName: nickName.value,
+          message: msg.value
         })
         // 发送成功后清除聊天内容
-        msg.value=''
+        msg.value = ''
       }
-      socket.on('userInfo',_userinfo=>{
-        userInfo=_userinfo
-      })
       // 接收广播信息
-      socket.on('messageData',msg=>{
+      socket.on('messageData', msg => {
         console.log(msg)
         createMessage(msg)
       })
+      // 记录当前临时用户名
+      socket.on('storageNickName', data => {
+        sessionStorage.setItem(NICK_NAME, data)
+      })
     }
     // 创建聊天内容气泡
-    function createMessage(msg){
-      let group=document.createElement('div')
-      group.className='chat-room-msg-group'
-      let item=document.createElement('div')
-      item.className='chat-room-msg-item'
-      let itemText=document.createTextNode(msg.nickName)
+    function createMessage(msg) {
+      console.log(userInfo)
+      let group = document.createElement('div')
+      group.className = 'chat-room-msg-group'
+      let item = document.createElement('div')
+      item.className = 'chat-room-msg-item'
+      let itemText = document.createTextNode(msg.nickName)
       item.appendChild(itemText)
-      let data=document.createElement('div')
-      data.className='chat-room-msg-data'
+      let data = document.createElement('div')
+      data.className = 'chat-room-msg-data'
       group.appendChild(item)
-      let dataText=document.createTextNode(msg.message)
+      let dataText = document.createTextNode(msg.message)
       data.appendChild(dataText)
       group.appendChild(data)
-      let msgBody=document.getElementById('msgBody')
+      let msgBody = document.getElementById('msgBody')
       msgBody.appendChild(group)
     }
+    // // 创建在线用户
+    // function createClients(){
+    //   // <div class="chat-room-friend-item">
+    //   //   </div>
+    // }
   </script>
 </body>
+
 </html>
